@@ -1,30 +1,37 @@
-FROM php:8.2-fpm
+FROM php:8.2-apache
 
+# Install dependencies termasuk libpq-dev untuk PostgreSQL
 RUN apt-get update && apt-get install -y \
-    build-essential \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libzip-dev \
+    libpq-dev \               # <- library development PostgreSQL
     zip \
     unzip \
     git \
     curl \
-    libzip-dev \
-    libpq-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    && docker-php-ext-install pdo pdo_mysql zip exif pcntl
+  && docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    pdo_pgsql \              # <- aktifkan driver pgsql
+    zip
 
+# Aktifkan mod_rewrite agar Laravel bisa menggunakan pretty URLs
+RUN a2enmod rewrite
+
+WORKDIR /var/www/html
+
+# Copy composer binary dan install Laravel dependencies
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-WORKDIR /var/www
-
 COPY . .
-
 RUN composer install --optimize-autoloader --no-dev
 
-COPY .docker/render.ini /usr/local/etc/php/conf.d/render.ini
+# Gunakan konfigurasi Apache dari folder docker/
+COPY docker/vhost.conf /etc/apache2/sites-available/000-default.conf
 
-RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
+# Set permission folder storage dan bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-CMD php artisan serve --host=0.0.0.0 --port=10000
+# Saat container start, jalankan migrasi lalu start Apache
+CMD php artisan migrate --force && apache2-foreground
