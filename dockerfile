@@ -27,7 +27,7 @@ COPY . .
 RUN composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
 
 # Configure Apache virtual host
-COPY docker/vhost.conf /etc/apache2/sites-available/000-default.conf
+COPY .docker/vhost.conf /etc/apache2/sites-available/000-default.conf
 
 # Set proper permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
