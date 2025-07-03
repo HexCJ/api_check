@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 // Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
 Route::get('/users', [UserController::class, 'index']);
+Route::get('/users/{id}', [UserController::class, 'show']); 
 Route::post('/tambah', [UserController::class, 'store']);
 Route::put('/update/{id}', [UserController::class, 'update']);
 Route::delete('/hapus/{id}', [UserController::class, 'destroy']);
