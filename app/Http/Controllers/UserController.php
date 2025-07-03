@@ -17,6 +17,18 @@ class UserController extends Controller
         ]);
     }
 
+    public function show($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User tidak ditemukan'], 404);
+        }
+
+        return response()->json($user);
+    }
+
+
     public function store(Request $request)
     {
         $validated = $request->validate([
