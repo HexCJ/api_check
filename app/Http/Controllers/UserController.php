@@ -60,7 +60,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name'       => 'sometimes|string|max:255',
             'email'      => 'sometimes|email|unique:users,email,' . $id,
-            'password'   => 'sometimes|string|min:6',
+            // 'password'   => 'sometimes|string|min:6',
             ]);
         if (isset($validated['name'])) {
             $user->name = $validated['name'];
